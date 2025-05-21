@@ -162,7 +162,7 @@ void Access_Player_Information(map<string, string> Player_Data){
     cout << "Age: " << Player_Information["age"] << endl;
     cout << "Height: " << Player_Information["displayHeight"] << endl;
     cout << "Weight: " << Player_Information["displayWeight"] << endl;
-    cout << "Draft Year: " << Player_Information["debutYear"] << endl;
+    cout << "Draft Year: " << (Player_Information["draft"])["year"] << endl;
     cout << "Position: " << (Player_Information["position"])["displayName"] << endl;
 
 
