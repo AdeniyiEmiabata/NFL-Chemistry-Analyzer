@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <map>
 #include <thread>
+#include <future>
 
 using namespace std;
 using json = nlohmann::json;
@@ -168,7 +169,7 @@ void Access_Player_Information(map<string, string> Player_Data){
     cout << "Position: " << (Player_Information["position"])["displayName"] << endl;
 }
 
-void Run_All_Functions(){
+map<string, string> SetUp_DataStructures(){
 
     int Position = Get_Team_Name();
 
@@ -176,12 +177,43 @@ void Run_All_Functions(){
 
     map<string, string> Player_Data = Get_Player_Data(Team_Data);
 
-    Access_Player_Information(Player_Data);
+    return Player_Data;
+
 }
+
 
 int main(){
 
-    Run_All_Functions();
-    
+    //string num_players;
+    //int num_players_int;
+    //cout << "How many players do you want to look up?" << endl;
+    // getline(cin, num_players);
+    // num_players_int = stoi(num_players);
+    // int count = 0;
+
+    // while (count < num_players_int){}
+    cout << "Player 1" << endl<<endl;
+    future<map<string,string>> map_result = async(launch::async, SetUp_DataStructures);
+
+    this_thread::sleep_for(chrono::seconds(15));
+
+    cout << endl;
+
+    cout << "Player 2"<< endl<<endl;
+    future<map<string,string>> map_result_2 = async(launch::async, SetUp_DataStructures);
+    this_thread::sleep_for(chrono::seconds(35));
+
+    cout << endl;
+
+    cout << "Player 1" << endl<<endl;
+    thread t1 (Access_Player_Information, map_result.get());
+    this_thread::sleep_for(chrono::seconds(15));
+
+    cout << "Player 2" << endl<<endl;
+    thread t2 (Access_Player_Information, map_result_2.get());
+
+    t1.join();
+    t2.join();
+
     return 0;
 }
