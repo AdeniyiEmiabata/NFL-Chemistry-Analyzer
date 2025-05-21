@@ -6,6 +6,7 @@
 #include <string>
 #include <filesystem>
 #include <map>
+#include <thread>
 
 using namespace std;
 using json = nlohmann::json;
@@ -158,26 +159,29 @@ void Access_Player_Information(map<string, string> Player_Data){
 
     json Player_Information = json::parse(Result_Player_Information->body);
 
-    cout << "**********Player Bio**************" << endl << endl;
+    cout << "\n\n**********Player Bio**************" << endl << endl;
     cout << "Player Name: " << Player_Name << endl;
     cout << "Age: " << Player_Information["age"] << endl;
     cout << "Height: " << Player_Information["displayHeight"] << endl;
     cout << "Weight: " << Player_Information["displayWeight"] << endl;
     cout << "Draft Year: " << (Player_Information["draft"])["year"] << endl;
     cout << "Position: " << (Player_Information["position"])["displayName"] << endl;
+}
 
+void Run_All_Functions(){
 
+    int Position = Get_Team_Name();
+
+    string Team_Data = GET_Team_Data_from_HTTP(Position);
+
+    map<string, string> Player_Data = Get_Player_Data(Team_Data);
+
+    Access_Player_Information(Player_Data);
 }
 
 int main(){
 
-    int Position = Get_Team_Name();
-
-    GET_Team_Data_from_HTTP(Position);
-
-    Get_Player_Data(GET_Team_Data_from_HTTP(Position));
-
-    Access_Player_Information(Get_Player_Data(GET_Team_Data_from_HTTP(Position)));
+    Run_All_Functions();
     
     return 0;
 }
