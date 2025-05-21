@@ -149,6 +149,11 @@ void Access_Player_Information(map<string, string> Player_Data){
 
     getline(cin, Player_Name);
 
+    if(Player_Data.find(Player_Name) == Player_Data.end()){
+        cout << "This player is in a different team" << endl;
+        exit(0);
+    }
+
     auto Result_Player_Information = client_1.Get(Player_Data[Player_Name]);
 
     json Player_Information = json::parse(Result_Player_Information->body);
