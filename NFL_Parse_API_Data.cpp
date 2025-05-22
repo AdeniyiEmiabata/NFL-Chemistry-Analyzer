@@ -44,7 +44,7 @@ vector<string> List_of_NFL_Teams = {
     "New York Jets",
     "Philadelphia Eagles",
     "Pittsburgh Steelers",
-    "Seattle Seahawks"
+    "Seattle Seahawks",
     "San Francisco 49ers",
     "Tampa Bay Buccaneers",
     "Tennessee Titans",
