@@ -72,7 +72,7 @@ int Get_Team_Name(){
    
 }
 
-string GET_Team_Data_from_HTTP(int Position){
+string GET_Team_Data_from_HTTP(int& Position){
 
     auto Result_Teams = client_1.Get(NFL_Teams_Path);
 
@@ -90,7 +90,7 @@ string GET_Team_Data_from_HTTP(int Position){
 
 }
 
-map<string, string> Get_Player_Data(string Team_Path){
+map<string, string> Get_Player_Data(string& Team_Path){
     
     auto Results_Players = client_1.Get(Team_Path);
 
@@ -142,7 +142,13 @@ map<string, string> Get_Player_Data(string Team_Path){
 
 }
 
-void Access_Player_Information(map<string, string> Player_Data){
+string Remove_Quotes_from_String(string Data){
+    Data.erase(std::remove(Data.begin(), Data.end(), '\"'), Data.end());
+
+    return Data;
+}
+
+void Access_Player_Information(map<string, string> &Player_Data){
     
     string Player_Name;
 
@@ -159,20 +165,28 @@ void Access_Player_Information(map<string, string> Player_Data){
 
     json Player_Information = json::parse(Result_Player_Information->body);
 
-    cout << "\n\n**********Player Bio**************" << endl << endl;
+    cout << "\n**********Player Bio**************" << endl << endl;
     cout << "Player Name: " << Player_Name << endl;
     cout << "Age: " << Player_Information["age"] << endl;
-    cout << "Height: " << Player_Information["displayHeight"] << endl;
-    cout << "Weight: " << Player_Information["displayWeight"] << endl;
+    cout << "Height: " << Remove_Quotes_from_String(Player_Information["displayHeight"]) << endl;
+    cout << "Weight: " << Remove_Quotes_from_String(Player_Information["displayWeight"]) << endl;
     cout << "Draft Year: " << (Player_Information["draft"])["year"] << endl;
-    cout << "Position: " << (Player_Information["position"])["displayName"] << endl;
+    cout << "Position: " << Remove_Quotes_from_String((Player_Information["position"])["displayName"]) << endl;
 }
 
 void Run_All_Functions(){
 
     int Position = Get_Team_Name();
 
+    cout << endl;
+
     string Team_Data = GET_Team_Data_from_HTTP(Position);
+
+    this_thread::sleep_for(chrono::seconds(5));
+
+    cout << "Loading team data..." << endl;
+
+    cout << endl;
 
     map<string, string> Player_Data = Get_Player_Data(Team_Data);
 
