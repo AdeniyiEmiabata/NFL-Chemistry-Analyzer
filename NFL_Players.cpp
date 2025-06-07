@@ -3,37 +3,55 @@
 #include <string>
 #include <set>
 #include <algorithm>
+#include <sqlite3.h>
+#include <map>
 #include "NFL_Players.hpp"
 
 using namespace std;
-
-vector<string> AFC_East = {"AFC East","Buffalo Bills", "New York Jets", "New England Patriots", "Miami Dolphins"};
-vector<string> AFC_West = {"AFC West","Kansas City Chiefs", "Las Vegas Raiders", "Denver Broncos", "Los Angeles Chargers"};
-vector<string> AFC_North = {"AFC North","Baltimore Ravens", "Pittsburgh Steelers", "Cincinnati Bengals", "Cleveland Browns"};
-vector<string> AFC_South = {"AFC South","Jacksonville Jaguars", "Tennessee Titans", "Indianapolis Colts", "Houston Texans"};
-
-vector<string> NFC_East = {"NFC East","Washington Commanders", "Dallas Cowboys", "Philadelphia Eagles", "New York Giants"};
-vector<string> NFC_West = {"NFC West","Seattle Seahwaks", "San Francisco 49ers", "Arizona Cardinals", "Los Angeles Rams"};
-vector<string> NFC_North = {"NFC North","Green Bay Packers", "Minnesota Vikings", "Chicago Bears", "Detroit Lions"};
-vector<string> NFC_South = {"NFC South","Tampa Bay Buccaneers", "New Orleans Saints", "Carolina Panthers", "Atlanta Falcons"};
+map<string, string> List_of_NFL_Teams = { {"Arizona Cardinals","NFC West"},
+{"Atlanta Falcons", "NFC South"},
+{"Baltimore Ravens", "AFC North"},
+{"Buffalo Bills", "AFC East"},
+{"Carolina Panthers", "NFC South"},
+{"Chicago Bears","NFC North"},
+{"Cincinnati Bengals","AFC North"},
+{"Cleveland Browns", "AFC North"},
+{"Dallas Cowboys", "NFC East"},
+{"Denver Broncos","AFC West"},
+{"Detroit Lions", "NFC North"},
+{"Green Bay Packers", "NFC North"},
+{"Houston Texans", "AFC South"},
+{"Indianapolis Colts", "AFC South"},
+{"Jacksonville Jaguars", "AFC South"},
+{"Kansas City Chiefs", "AFC West"},
+{"Los Angeles Chargers", "AFC West"},
+{"Los Angeles Rams", "NFC West"},
+{"Las Vegas Raiders", "AFC West"},
+{"Miami Dolphins", "AFC East"},
+{"Minnesota Vikings", "NFC North"},
+{"New England Patriots", "AFC East"},
+{"New Orleans Saints", "NFC South"},
+{"New York Giants", "NFC East"},
+{"New York Jets", "AFC East"},
+{"Philadelphia Eagles", "NFC East"},
+{"Pittsburgh Steelers", "AFC North"},
+{"Seattle Seahawks", "NFC West"},
+{"San Francisco 49ers", "NFC West"},
+{"Tampa Bay Buccaneers", "NFC South"},
+{"Tennessee Titans", "AFC South"},
+{"Washington Commanders", "NFC East"}
+};
 
 // List of Positions (Sides of the Ball)
-vector<string> Defense = {"Defensive Linemen", "Defensive Backs", "Linebackers"};
-vector<string> Offense = {"Offensive Linemen", "Receivers", "Running Backs", "Quarterback"};
+vector<string> Defense = {"Defensive Linemen", "Linebacker", "Defensive Back"};
+vector<string> Offense = {"Quarterback", "Offensive Linemen", "Receiver", "Running Back"};
+vector<string> Special_Teams = {"Special Teams"};
 
-// Position Groups
-vector<string> Offensive_Line = {"LT", "C", "RT", "LG", "RG", "Offensive Linemen"};
-vector<string> Receivers = {"WR", "TE", "Receivers"};
-vector<string> Running_Backs = {"FB", "RB", "Running Backs"}; 
-vector<string> Quarterback = {"QB", "Quarterback"};
 
-vector<string> Defensive_Line = {"DT", "DE", "Defensive Linemen"};
-vector<string> Defensive_Backs = {"CB", "FS", "SS", "Defensive Backs"};
-vector<string> Linebackers = {"MLB", "OLB", "Linebackers"};
-
-vector<vector<string>> All_Divisions;
-vector<vector<string>> Offensive_Position_Groups;
-vector<vector<string>> Defensive_Position_Groups;
+map<string, string> Position_Groups = {{"Defensive End", "Defensive Linemen"}, {"Linebacker", "Linebacker"}, {"Safety", "Defensive Back"},
+{"Cornerback", "Defensive Back"}, {"Defensive Tackle", "Defensive Linemen"}, {"Quarterback", "Quarterback"}, {"Guard", "Offensive Linemen"}, {"Center", "Offensive Linemen"},
+{"Offensive Tackle", "Offensive Linemen"}, {"Wide Receiver", "Receiver"}, {"Tight End", "Receiver"}, {"Running Back", "Running Back"}, {"Fullback", "Running Back"},
+{"Place Kicker", "Special Teams"}, {"Long Snapper", "Special Teams"}, {"Punter", "Special Teams"}};
 
 
 int NFL_Players::Calculate_Player_Relationship_Score (NFL_Players& PlayerA_Attributes, NFL_Players& PlayerB_Attributes){
@@ -136,11 +154,11 @@ void NFL_Players::Relationship_Remarks(NFL_Players& PlayerA_Attributes, NFL_Play
         cout << "We do not recommend having these players in the same team. Refresh the pool for better options!" << "\n";
         cout << "Low relationship scores affect player performance!" << "\n";
 
-        if((PlayerA_Attributes.Position_Group == "Receivers" && PlayerB_Attributes.Position == "QB") || (PlayerB_Attributes.Position_Group == "Receivers" && PlayerA_Attributes.Position == "QB")){
+        if((PlayerA_Attributes.Position_Group == "Receiver" && PlayerB_Attributes.Position == "Quarterback") || (PlayerB_Attributes.Position_Group == "Receiver" && PlayerA_Attributes.Position == "Quarterback")){
             cout << "Your QB will struggle to be on the same page with your receiver! QB-Receiver chemistry is critical to a good offense\n";
         }
 
-        if((PlayerA_Attributes.Position_Group == "Receivers" && PlayerB_Attributes.Position == "QB") || (PlayerB_Attributes.Position_Group == "Receivers" && PlayerA_Attributes.Position == "QB")){
+        if((PlayerA_Attributes.Position_Group == "Receiver" && PlayerB_Attributes.Position == "Quarterback") || (PlayerB_Attributes.Position_Group == "Receiver" && PlayerA_Attributes.Position == "Quarterback")){
             cout << "Your QB will struggle to be on the same page with your receiver! QB-Receiver chemistry is critical to a good offense\n";
         }
 
@@ -155,7 +173,7 @@ void NFL_Players::Relationship_Remarks(NFL_Players& PlayerA_Attributes, NFL_Play
         cout << "These players are compatible. Reinforce your team with other players with higher relationship scores" << "\n";
         cout << "Low relationship scores affect player performance!" << "\n";
 
-        if((PlayerA_Attributes.Position_Group == "Receivers" && PlayerB_Attributes.Position == "QB") || (PlayerB_Attributes.Position_Group == "Receivers" && PlayerA_Attributes.Position == "QB")){
+        if((PlayerA_Attributes.Position_Group == "Receiver" && PlayerB_Attributes.Position == "Quarterback") || (PlayerB_Attributes.Position_Group == "Receiverr" && PlayerA_Attributes.Position == "Quarterback")){
             cout << "Your QB may struggle to be on the same page with your receiver! QB-Receiver chemistry is critical to a good offense\n";
         }
 
@@ -175,7 +193,7 @@ void NFL_Players::Relationship_Remarks(NFL_Players& PlayerA_Attributes, NFL_Play
         }
         cout << "These players are very compatible. Reinforce your team with more players with good relationship scores" << "\n";
         cout << "High relationship scores improve player performance" << "\n";
-        if((PlayerA_Attributes.Position_Group == "Receivers" && PlayerB_Attributes.Position == "QB") || (PlayerB_Attributes.Position_Group == "Receivers" && PlayerA_Attributes.Position == "QB")){
+        if((PlayerA_Attributes.Position_Group == "Receiver" && PlayerB_Attributes.Position == "Quarterback") || (PlayerB_Attributes.Position_Group == "Receiver" && PlayerA_Attributes.Position == "Quarterback")){
             cout << "Your QB will have no trouble building a good relationship with your receiver!\n";
         }
         return;
@@ -189,7 +207,7 @@ void NFL_Players::Relationship_Remarks(NFL_Players& PlayerA_Attributes, NFL_Play
         cout << "These players will gel very well. Search the player pool for more players with similar relationship scores" << "\n";
         cout << "High relationship scores improve player performance" << "\n";
 
-        if((PlayerA_Attributes.Position_Group == "Receivers" && PlayerB_Attributes.Position == "QB") || (PlayerB_Attributes.Position_Group == "Receivers" && PlayerA_Attributes.Position == "QB")){
+        if((PlayerA_Attributes.Position_Group == "Receiver" && PlayerB_Attributes.Position == "Quarterback") || (PlayerB_Attributes.Position_Group == "Receiver" && PlayerA_Attributes.Position == "Quarterback")){
             cout << "This QB-Receiver duo can be the foundation of your offense!\n";
         }
         return;
@@ -211,7 +229,7 @@ void NFL_Players::Relationship_Remarks(NFL_Players& PlayerA_Attributes, NFL_Play
     return;
 }
 
-NFL_Players Generate_Player(){
+NFL_Players Generate_Player(sqlite3* DB){
     string Name;
     string Team;
     string Division;
@@ -220,30 +238,83 @@ NFL_Players Generate_Player(){
     string Position_Group;
     string Broader_Position_Group;
     int Draft_Year;
+    int Age;
 
-    cout << "\nWelcome to the NFL Player Comparison Tool: Compare players to help your team-building process\n\n" << "------Hit Enter to Start!-------";
+    char querySQL[256];
+    string player_name;
+    cout << "Enter Player Name (WARNING: Include any name Suffixes!): " << endl;
+    getline(cin, player_name);
 
-    //to ensure the last cin>> for Draft_Year does not affect the first getline for the 2nd player getline(cin, Name): Needs Fixing
-    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    snprintf(querySQL, 256, "SELECT COUNT(*) FROM Players WHERE Name = '%s'", player_name.c_str());
+    const char* querySQL_const = querySQL;
+    sqlite3_stmt *statement; // associative table, pointer to first row
+
+    sqlite3_prepare_v2(DB, querySQL_const, -1, &statement, NULL); //prepare statement in binary format
+
+    sqlite3_step(statement);
+
+    if (sqlite3_column_int(statement, 0) > 1){
+        int num_players = sqlite3_column_int(statement, 0);
+        cout << "There are " << num_players << " players with that name" << endl << endl;
+
+        char querySQL_multipleplayers [256];
+        snprintf(querySQL_multipleplayers, 256, "SELECT * FROM Players WHERE Name = '%s'", player_name.c_str());
+        const char* querySQL_multipleplayers_const = querySQL_multipleplayers;
+        sqlite3_stmt *multipleplayers_stmt;
+        sqlite3_prepare_v2(DB, querySQL_multipleplayers_const, -1, &multipleplayers_stmt, NULL);
+
+        while(sqlite3_step(multipleplayers_stmt)!=SQLITE_DONE){
+            cout << player_name << ", Team: " << sqlite3_column_text(multipleplayers_stmt, 3) << ", Position: " << sqlite3_column_text(multipleplayers_stmt, 2) << endl;
+        }
+
+        cout << "Enter team name for desired player: " << endl;
+        string team_name;
+        getline(cin, team_name);
+
+        char querySQL_finalselection [256];
+        snprintf(querySQL_finalselection, 256, "SELECT * FROM Players WHERE Name = '%s' AND Team = '%s'", player_name.c_str(), team_name.c_str());
+        const char* querySQL_finalselection_const = querySQL_finalselection;
+        sqlite3_stmt *final_selection_stmt;
+        sqlite3_prepare_v2(DB, querySQL_finalselection_const, -1, &final_selection_stmt, NULL);
+
+        sqlite3_step(final_selection_stmt);
+        Name = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 1));
+        Position = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 2));
+        Team = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 3));
+
+        Age = sqlite3_column_int(final_selection_stmt, 4);
+
+        Draft_Year = sqlite3_column_int(final_selection_stmt, 5);
+        
+        College = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 6));
+
+    }
+
+    else if(sqlite3_column_int(statement, 0) == 1){
+        char querySQL_singleplayer [256];
+        snprintf(querySQL_singleplayer, 256, "SELECT * FROM Players WHERE Name = '%s'", player_name.c_str());
+        const char* querySQL_singleplayer_const = querySQL_singleplayer;
+        sqlite3_stmt *singleplayer_stmt; // associative table, pointer to first row
+
+        sqlite3_prepare_v2(DB, querySQL_singleplayer_const, -1, &singleplayer_stmt, NULL); //prepare statement in binary format??
+
+        sqlite3_step(singleplayer_stmt);
+        Name = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 1));
+        Position = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 2));
+        Team = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 3));
+
+        Age = sqlite3_column_int(singleplayer_stmt, 4);
+
+        Draft_Year = sqlite3_column_int(singleplayer_stmt, 5);
+
+        College = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 6));
+    }
+
+    else{
+        cout << "The player name entered is incorrect! Check for spelling errors or missing suffixes!" << endl;
+        exit(0);
+    }
     
-    cout << "\nNOTE: Be mindful of letter casing when entering details!" << "\n";
-
-    cout << "\n\nInput Player Name: " << "\n";
-    getline(cin, Name);
-
-    cout << "\n\nInput Player Team: " << "\n";
-    getline(cin, Team);
-
-    cout << "\n\nInput Player Position: " << "\n";
-    getline(cin, Position);
-
-    cout << "\n\nInput Player College: " << "\n";
-    getline(cin, College);
-
-    cout << "\n\nInput Player's Draft Year: " << "\n";
-    cin >> Draft_Year;
-
-    cout << "\n\n";
     Division = Search_Division(Team);
     Position_Group = Search_PositionGroup(Position);
     Broader_Position_Group = Search_Broader_Position_Group (Position_Group);
@@ -253,49 +324,9 @@ NFL_Players Generate_Player(){
 
 }
 
-// void NFL_Players::Print_Player_Bio(NFL_Players&Player_Details){
-//     std::cout << "PLAYER BIO " << "\n";
-//     std::cout << "NAME: " << Player_Details.Name << "\n";
-//     std::cout << "TEAM: " << Player_Details.Team << "\n";
-//     std::cout << "TEAM DIVISION: " << Player_Details.Division << "\n";
-//     std::cout << "POSITION: " << Player_Details.Position << "\n";
-//     std::cout << "POSITION GROUP: " << Player_Details.Position_Group << "\n";
-//     std::cout << "SIDE OF THE BALL: " << Player_Details.Broader_Position_Group << "\n";
-//     std::cout << "COLLEGE: " << Player_Details.College << "\n";
-//     std::cout << "DRAFT YEAR: " << Player_Details.Draft_Year << "\n\n";
-// }
-
 string Search_Division(string Team_Name){
 
-    string Division;
-    Division = "Team Not Found! Restart and Check your spelling and/or letter casing\n\n";
-    All_Divisions.push_back(AFC_East);
-    All_Divisions.push_back(NFC_East);
-    All_Divisions.push_back(AFC_West);
-    All_Divisions.push_back(NFC_West);
-    All_Divisions.push_back(AFC_North);
-    All_Divisions.push_back(NFC_North);
-    All_Divisions.push_back(AFC_South);
-    All_Divisions.push_back(NFC_South);
-
-    for(vector<vector<string>>::iterator Iter = All_Divisions.begin(); Iter != All_Divisions.end(); Iter++){
-
-       std::vector<string>::iterator Iter_Division =  std::find((*Iter).begin(), (*Iter).end(), Team_Name);
-
-       if (Iter_Division != (*Iter).end()){
-            Division = *((*Iter).begin());
-            break;
-       }
-
-       //else{
-            
-        
-       //}
-        // if((*Iter).contains(Team_Name)){
-        //     Division = *((*Iter).begin());
-        //     return Division;
-        // }       
-    }
+    string Division = List_of_NFL_Teams[Team_Name];
 
     return Division;
     
@@ -304,49 +335,15 @@ string Search_Division(string Team_Name){
 
 string Search_PositionGroup(string Position){
 
-    string Position_Group = "Position group not found! Check spelling of position!";
-    Offensive_Position_Groups.push_back(Offensive_Line);
-    Offensive_Position_Groups.push_back(Receivers);
-    Offensive_Position_Groups.push_back(Running_Backs);
-    Offensive_Position_Groups.push_back(Quarterback);
-
-    Defensive_Position_Groups.push_back(Defensive_Line);
-    Defensive_Position_Groups.push_back(Defensive_Backs);
-    Defensive_Position_Groups.push_back(Linebackers);
-
-    for(vector<vector<string>>::iterator Iter = Offensive_Position_Groups.begin(); Iter != Offensive_Position_Groups.end(); Iter++){
-        std::vector<string>::iterator Iter_Position_Group =  std::find((*Iter).begin(), (*Iter).end(), Position);
-        if(Iter_Position_Group != (*Iter).end()){
-            Position_Group = *((*Iter).end() - 1);
-            break;
-        }
-        
-        // if((*Iter).contains(Position)){
-        //     Position_Group = *(prev((*Iter).end(), 1));
-        //     std::cout << Position_Group << "\n";
-        // }
-    }
-
-    for(vector<vector<string>>::iterator Iter = Defensive_Position_Groups.begin(); Iter != Defensive_Position_Groups.end(); Iter++){
-        std::vector<string>::iterator Iter_Position_Group =  std::find((*Iter).begin(), (*Iter).end(), Position);
-        if (Iter_Position_Group != (*Iter).end()){
-            Position_Group = *((*Iter).end() - 1);
-            break;
-        }
-        
-        // if((*Iter).contains(Position)){
-        //     Position_Group = *(std::prev((*Iter).end(),1));
-        //     std::cout << Position_Group << "\n";
-        // }
-    }
-
-
+    string Position_Group = Position_Groups[Position];
+    
     return Position_Group;
 }
 
 string Search_Broader_Position_Group (string Position_Group){
     
-    string Broader_Position_Group = "Broader Position group not found! Please check spelling of Position!";
+    string Broader_Position_Group;
+
     vector<string>::iterator Offensive_Iter = std::find(Offense.begin(), Offense.end(), Position_Group);
     if (Offensive_Iter != Offense.end()){
         Broader_Position_Group = "Offense";

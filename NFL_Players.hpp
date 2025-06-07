@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <set>
-
+#include <sqlite3.h>
 using namespace std;
 
 // List of Divisions
@@ -40,6 +40,7 @@ string College;
 string Position_Group;
 string Broader_Position_Group;
 int Draft_Year;
+string age;
 // string Phase (to be added)
 public:
 NFL_Players(string Name, string Team, string Division, string Position, string College, string Position_Group, string Broader_Position_Group, int Draft_Year):Name(Name), Team(Team), Division(Division), 
@@ -67,7 +68,7 @@ static void Relationship_Remarks(NFL_Players& PlayerA_Attributes, NFL_Players& P
 
 string Search_Division(string Team_Name);
 
-NFL_Players Generate_Player();
+NFL_Players Generate_Player(sqlite3*DB);
 
 string Search_PositionGroup(string Position);
 
