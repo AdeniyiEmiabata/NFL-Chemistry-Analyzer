@@ -74,3 +74,4 @@ string Search_PositionGroup(string Position);
 
 string Search_Broader_Position_Group (string Position_Group);
 
+string Escape_Character(string Player_Info);

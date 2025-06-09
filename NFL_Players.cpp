@@ -244,6 +244,10 @@ NFL_Players Generate_Player(sqlite3* DB){
     string player_name;
     cout << "Enter Player Name (WARNING: Include any name Suffixes!): " << endl;
     getline(cin, player_name);
+    
+    if(player_name.contains("'")){
+        player_name = Escape_Character(player_name);
+    }
 
     snprintf(querySQL, 256, "SELECT COUNT(*) FROM Players WHERE Name = '%s'", player_name.c_str());
     const char* querySQL_const = querySQL;
@@ -355,4 +359,16 @@ string Search_Broader_Position_Group (string Position_Group){
     }
 
     return Broader_Position_Group;
+}
+
+string Escape_Character(string Player_Info){
+    string Output_String;
+    for(auto i: Player_Info){
+        if(i == '\''){
+            Output_String += '\'';
+        }
+        Output_String += i;
+    }
+
+    return Output_String;
 }
