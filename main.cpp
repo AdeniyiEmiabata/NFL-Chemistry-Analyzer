@@ -13,7 +13,7 @@ int main(){
 sqlite3* DB;
 char* errmsg = nullptr;
 
-if(sqlite3_open("Player_Data_01062025.db", &DB)){
+if(sqlite3_open("Player_Data_June11_2025.db", &DB)){
     cout << "DB cannot be opened: " << sqlite3_errmsg(DB) << endl;
     exit(0);
 }
