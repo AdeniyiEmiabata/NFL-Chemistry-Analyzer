@@ -53,6 +53,39 @@ map<string, string> Position_Groups = {{"Defensive End", "Defensive Linemen"}, {
 {"Offensive Tackle", "Offensive Linemen"}, {"Wide Receiver", "Receiver"}, {"Tight End", "Receiver"}, {"Running Back", "Running Back"}, {"Fullback", "Running Back"},
 {"Place Kicker", "Special Teams"}, {"Long Snapper", "Special Teams"}, {"Punter", "Special Teams"}};
 
+map<string, pair<string,string>> List_of_Offensive_Defensive_Schemes = {{"Arizona Cardinals",{"West Coast", "4-3"}},
+{"Atlanta Falcons", {"West Coast","3-4"}},
+{"Baltimore Ravens", {"Air Coryell", "3-4"}},
+{"Buffalo Bills", {"Erhardt-Perkins", "4-3"}},
+{"Carolina Panthers", {"West Coast", "3-4"}},
+{"Chicago Bears",{"West Coast", "4-3"}},
+{"Cincinnati Bengals",{"West Coast", "4-3"}},
+{"Cleveland Browns", {"West Coast", "4-3"}},
+{"Dallas Cowboys", {"Air Coryell", "4-3"}},
+{"Denver Broncos",{"Air Coryell", "3-4"}},
+{"Detroit Lions", {"Erhardt-Perkins", "4-3"}},
+{"Green Bay Packers", {"West Coast", "4-3"}},
+{"Houston Texans", {"West Coast","4-3"}},
+{"Indianapolis Colts", {"West Coast", "4-3"}},
+{"Jacksonville Jaguars", {"West Coast", "4-3"}},
+{"Kansas City Chiefs", {"West Coast", "4-3"}},
+{"Los Angeles Chargers", {"West Coast", "3-4"}},
+{"Los Angeles Rams", {"West Coast", "3-4"}},
+{"Las Vegas Raiders", {"West Coast", "3-4"}},
+{"Miami Dolphins",{"West Coast", "4-3"}},
+{"Minnesota Vikings", {"West Coast", "3-4"}},
+{"New England Patriots", {"West Coast", "4-3"}},
+{"New Orleans Saints", {"West Coast", "4-3"}},
+{"New York Giants", {"Erhardt-Perkins", "3-4"}},
+{"New York Jets", {"West Coast", "4-3"}},
+{"Philadelphia Eagles", {"Air Coryell", "4-3"}},
+{"Pittsburgh Steelers", {"West Coast", "3-4"}},
+{"Seattle Seahawks", {"Spread", "4-3"}},
+{"San Francisco 49ers", {"West Coast", "4-3"}},
+{"Tampa Bay Buccaneers", {"West Coast", "3-4"}},
+{"Tennessee Titans", {"West Coast", "4-3"}},
+{"Washington Commanders", {"Spread", "4-3"}}
+};
 
 int NFL_Players::Calculate_Player_Relationship_Score (NFL_Players& PlayerA_Attributes, NFL_Players& PlayerB_Attributes){
     int Score = 0;
@@ -71,43 +104,66 @@ int NFL_Players::Calculate_Player_Relationship_Score (NFL_Players& PlayerA_Attri
         if (PlayerA_Attributes.College == PlayerB_Attributes.College){
             Score += 3;
         }
-        else if (abs(PlayerA_Attributes.Draft_Year - PlayerB_Attributes.Draft_Year) < 2){
+        else if (abs(PlayerA_Attributes.Draft_Year - PlayerB_Attributes.Draft_Year) <= 2){
             Score += 3;
         }
     }
 
-    // DIVISION_FOCUSED: MAXIMUM 90
-    else if (PlayerA_Attributes.Division == PlayerB_Attributes.Division){
-        Score += 60;
+    // SCHEME_FOCUSED: MAXIMUM 90
+    else if (PlayerA_Attributes.Broader_Position_Group == PlayerB_Attributes.Broader_Position_Group){
+            Score += 50;
 
-        if (PlayerA_Attributes.Broader_Position_Group == PlayerB_Attributes.Broader_Position_Group){
-            Score += 10;
+            if(PlayerA_Attributes.Broader_Position_Group == "Offense"){
+                if(Offensive_Scheme(PlayerA_Attributes.Team) == Offensive_Scheme(PlayerB_Attributes.Team)){
+                    Score += 20;
+                }
+            }
+        
+            else if(PlayerA_Attributes.Broader_Position_Group == "Defense"){
+                if(Defensive_Scheme(PlayerA_Attributes.Team) == Defensive_Scheme(PlayerB_Attributes.Team)){
+                    Score += 20;
+                }
+            }
+
             if (PlayerA_Attributes.Position_Group == PlayerB_Attributes.Position_Group){
-                Score+= 5;
+                Score+= 4;
                 if (PlayerA_Attributes.Position == PlayerB_Attributes.Position){
                     Score+= 7;
                 }
             }
-        }
 
         if (PlayerA_Attributes.College == PlayerB_Attributes.College){
             Score += 3;
-            if(abs(PlayerA_Attributes.Draft_Year - PlayerB_Attributes.Draft_Year) < 2){
+            if(abs(PlayerA_Attributes.Draft_Year - PlayerB_Attributes.Draft_Year) <= 2){
                 Score += 5;
             }
         }
 
-        else if(abs(PlayerA_Attributes.Draft_Year - PlayerB_Attributes.Draft_Year) < 2){
-                Score += 3;
+        else if(abs(PlayerA_Attributes.Draft_Year - PlayerB_Attributes.Draft_Year) <= 2){
+                Score += 1;
         }
     }
 
+
     // COLLEGE-FOCUSED: MAXIMUM 80
     else if(PlayerA_Attributes.College == PlayerB_Attributes.College){
-        Score+= 50;
+        Score+= 30;
 
         if ((PlayerA_Attributes.Broader_Position_Group == PlayerB_Attributes.Broader_Position_Group)){
             Score += 5;
+
+            if(PlayerA_Attributes.Broader_Position_Group == "Offense"){
+                if(Offensive_Scheme(PlayerA_Attributes.Team) == Offensive_Scheme(PlayerB_Attributes.Team)){
+                    Score += 20;
+                }
+            }
+        
+            else if(PlayerA_Attributes.Broader_Position_Group == "Defense"){
+                if(Defensive_Scheme(PlayerA_Attributes.Team) == Defensive_Scheme(PlayerB_Attributes.Team)){
+                    Score += 20;
+                }
+            }
+
             if (PlayerA_Attributes.Position_Group == PlayerB_Attributes.Position_Group){
                 Score+= 8;
                 if(PlayerA_Attributes.Position == PlayerB_Attributes.Position){
@@ -116,25 +172,10 @@ int NFL_Players::Calculate_Player_Relationship_Score (NFL_Players& PlayerA_Attri
             }
         }
 
-        if (abs(PlayerA_Attributes.Draft_Year - PlayerB_Attributes.Draft_Year) < 2){
+        if (abs(PlayerA_Attributes.Draft_Year - PlayerB_Attributes.Draft_Year) <= 2){
                 Score += 5;
         }
         
-    }
-
-    //POSITION-GROUP FOCUSED: MAXIMUM 55
-    else if(PlayerA_Attributes.Broader_Position_Group == PlayerB_Attributes.Broader_Position_Group){
-        Score += 35;
-        if (PlayerA_Attributes.Position_Group == PlayerB_Attributes.Position_Group){
-                Score += 10;
-                if(PlayerA_Attributes.Position == PlayerB_Attributes.Position){
-                    Score += 15;
-                }
-            }
-
-        if (abs(PlayerA_Attributes.Draft_Year - PlayerB_Attributes.Draft_Year) < 2){
-                Score += 5;
-            }
     }
 
     return Score;
@@ -237,6 +278,8 @@ NFL_Players Generate_Player(sqlite3* DB){
     string College;
     string Position_Group;
     string Broader_Position_Group;
+    string Offensive_Scheme;
+    string Defensive_Scheme;
     int Draft_Year;
     int Age;
 
@@ -323,7 +366,7 @@ NFL_Players Generate_Player(sqlite3* DB){
     Position_Group = Search_PositionGroup(Position);
     Broader_Position_Group = Search_Broader_Position_Group (Position_Group);
     NFL_Players Player_Details(Name, Team, Division, Position, College, Position_Group, Broader_Position_Group, Draft_Year);
-    //Print_Player_Bio(Player_Details);
+    
     return Player_Details;
 
 }
@@ -334,7 +377,6 @@ string Search_Division(string Team_Name){
 
     return Division;
     
-
 }
 
 string Search_PositionGroup(string Position){
@@ -371,4 +413,22 @@ string Escape_Character(string Player_Info){
     }
 
     return Output_String;
+}
+
+string Offensive_Scheme(string Team_Name){
+
+    string offense_scheme;
+
+    offense_scheme = (List_of_Offensive_Defensive_Schemes[Team_Name]).first;
+    
+    return offense_scheme;
+}
+
+string Defensive_Scheme(string Team_Name){
+    
+    string defense_scheme;
+
+    defense_scheme = (List_of_Offensive_Defensive_Schemes[Team_Name]).second;
+
+    return defense_scheme;
 }
