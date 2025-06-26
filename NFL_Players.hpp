@@ -58,3 +58,5 @@ string Escape_Character(string Player_Info);
 string Offensive_Scheme(string Team_Name);
 
 string Defensive_Scheme(string Team_Name);
+
+void Main_Func();
