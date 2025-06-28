@@ -89,8 +89,12 @@ map<string, pair<string,string>> List_of_Offensive_Defensive_Schemes = {{"Arizon
 
 int NFL_Players::Calculate_Player_Relationship_Score (NFL_Players& PlayerA_Attributes, NFL_Players& PlayerB_Attributes){
     int Score = 0;
+
+    if(PlayerA_Attributes.Broader_Position_Group != PlayerB_Attributes.Broader_Position_Group){
+       return Score;
+    }
     
-    // TEAM-FOCUSED: MAXIMUM 100
+    
     if(PlayerA_Attributes.Team == PlayerB_Attributes.Team){
         Score += 80;
 
@@ -109,7 +113,7 @@ int NFL_Players::Calculate_Player_Relationship_Score (NFL_Players& PlayerA_Attri
         }
     }
 
-    // SCHEME_FOCUSED: MAXIMUM 90
+    
     else if (PlayerA_Attributes.Broader_Position_Group == PlayerB_Attributes.Broader_Position_Group){
             Score += 50;
 
@@ -145,7 +149,7 @@ int NFL_Players::Calculate_Player_Relationship_Score (NFL_Players& PlayerA_Attri
     }
 
 
-    // COLLEGE-FOCUSED: MAXIMUM 80
+    
     else if(PlayerA_Attributes.College == PlayerB_Attributes.College){
         Score+= 30;
 
@@ -264,9 +268,8 @@ void NFL_Players::Relationship_Remarks(NFL_Players& PlayerA_Attributes, NFL_Play
         return;
     }
 
-    cout << PlayerA_Attributes.Name << " and " << PlayerB_Attributes.Name << " have an extremely low chemistry score of " << Relationship_Score << "\n";
-    cout << "Avoid putting these players in the same lineup!" << "\n";
-    cout << "Low relationship scores improve player performance" << "\n";
+    cout << PlayerA_Attributes.Name << " and " << PlayerB_Attributes.Name << " do not play on the same side of the ball!" << endl;
+    cout << "A logical comparison cannot be made" << "\n";
     return;
 }
 
@@ -289,7 +292,7 @@ NFL_Players Generate_Player(sqlite3* DB){
 
         char querySQL[256];
         string player_name;
-        cout << "Enter Player Name (WARNING: Include any name Suffixes!): " << endl << endl;
+        cout << endl << "Enter Player Name (WARNING: Include any name Suffixes!): " << endl;
         getline(cin, player_name);
         
         if(player_name.contains("'")){
@@ -333,8 +336,8 @@ NFL_Players Generate_Player(sqlite3* DB){
                 string team_name_final;
                 if(user_decision[0] == 'y' || user_decision[0] == 'Y'){
                     while(std::find(team_options_duplicate_name.begin(), team_options_duplicate_name.end(), team_name_final) == team_options_duplicate_name.end()){
-                        cout << "Enter 'N' at any point to exit" << endl;
-                        cout << "Enter team name for desired player: " << endl;
+                        cout << endl << "Enter 'N' at any point to exit" << endl;
+                        cout << endl << "Team name is incorrect! Enter team name for desired player: " << endl;
                         // string team_name;
                         getline(cin, team_name_final);
 
@@ -368,7 +371,7 @@ NFL_Players Generate_Player(sqlite3* DB){
             
             College = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 6));
 
-            //error_code = 0;
+            
 
             Division = Search_Division(Team);
             Position_Group = Search_PositionGroup(Position);
@@ -398,7 +401,7 @@ NFL_Players Generate_Player(sqlite3* DB){
 
             College = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 6));
 
-            //error_code = 0;
+            
 
             Division = Search_Division(Team);
             Position_Group = Search_PositionGroup(Position);
@@ -418,7 +421,8 @@ NFL_Players Generate_Player(sqlite3* DB){
     catch(int input_error)
     {
         string user_decision;
-        cout << endl << "The player name entered is incorrect! Check for spelling errors or missing suffixes!" << endl;
+        cout << endl << "That does not sound like an NFL player!" << endl;
+        cout << "The player name entered is incorrect! Check for spelling errors or missing suffixes!" << endl;
         cout << "Do you want to continue and re-enter a player's name? (Y/N): " << endl;
         getline(cin, user_decision);
 
@@ -501,7 +505,7 @@ void Main_Func(){
 sqlite3* DB;
 char* errmsg = nullptr;
 
-if(sqlite3_open("Player_Data_June11_2025.db", &DB)){
+if(sqlite3_open("Player_Data_June27_2025.db", &DB)){
     cout << "DB cannot be opened: " << sqlite3_errmsg(DB) << endl;
     exit(0);
 }
@@ -511,7 +515,7 @@ NFL_Players Player_1 = Generate_Player(DB);
 cout << "Press Enter to add a second player!" << endl;
 string empty;
 getline(cin, empty);
-//std::cout << "PLAYER 2" << "\n";
+
 NFL_Players Player_2 = Generate_Player(DB);
 
 NFL_Players::Calculate_Player_Relationship_Score(Player_1, Player_2);
