@@ -15,7 +15,7 @@ string Position_Group;
 string Broader_Position_Group;
 int Draft_Year;
 string age;
-// string Phase (to be added)
+
 public:
 NFL_Players(string Name, string Team, string Division, string Position, string College, string Position_Group, string Broader_Position_Group, int Draft_Year):Name(Name), Team(Team), Division(Division), 
 Position(Position), College(College), Position_Group(Position_Group), Broader_Position_Group(Broader_Position_Group), Draft_Year(Draft_Year){
@@ -40,8 +40,7 @@ Position(Position), College(College), Position_Group(Position_Group), Broader_Po
 static int Calculate_Player_Relationship_Score (NFL_Players& PlayerA_Attributes, NFL_Players& PlayerB_Attributes);
 static void Relationship_Remarks(NFL_Players& PlayerA_Attributes, NFL_Players& PlayerB_Attributes);
 
-// void Print_Player_Bio(NFL_Players&Player_Details){
-//}
+
 
 };
 
@@ -58,3 +57,5 @@ string Escape_Character(string Player_Info);
 string Offensive_Scheme(string Team_Name);
 
 string Defensive_Scheme(string Team_Name);
+
+void Main_Func();

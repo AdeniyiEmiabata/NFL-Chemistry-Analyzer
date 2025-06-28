@@ -89,8 +89,12 @@ map<string, pair<string,string>> List_of_Offensive_Defensive_Schemes = {{"Arizon
 
 int NFL_Players::Calculate_Player_Relationship_Score (NFL_Players& PlayerA_Attributes, NFL_Players& PlayerB_Attributes){
     int Score = 0;
+
+    if(PlayerA_Attributes.Broader_Position_Group != PlayerB_Attributes.Broader_Position_Group){
+       return Score;
+    }
     
-    // TEAM-FOCUSED: MAXIMUM 100
+    
     if(PlayerA_Attributes.Team == PlayerB_Attributes.Team){
         Score += 80;
 
@@ -109,7 +113,7 @@ int NFL_Players::Calculate_Player_Relationship_Score (NFL_Players& PlayerA_Attri
         }
     }
 
-    // SCHEME_FOCUSED: MAXIMUM 90
+    
     else if (PlayerA_Attributes.Broader_Position_Group == PlayerB_Attributes.Broader_Position_Group){
             Score += 50;
 
@@ -145,7 +149,7 @@ int NFL_Players::Calculate_Player_Relationship_Score (NFL_Players& PlayerA_Attri
     }
 
 
-    // COLLEGE-FOCUSED: MAXIMUM 80
+    
     else if(PlayerA_Attributes.College == PlayerB_Attributes.College){
         Score+= 30;
 
@@ -211,7 +215,7 @@ void NFL_Players::Relationship_Remarks(NFL_Players& PlayerA_Attributes, NFL_Play
         if (PlayerA_Attributes.Position_Group == PlayerB_Attributes.Position_Group){
             std::cout << "These players may weaken your " << PlayerA_Attributes.Position_Group << " group and your overall " << PlayerA_Attributes.Broader_Position_Group << "\n";
         }
-        cout << "These players are compatible. Reinforce your team with other players with higher relationship scores" << "\n";
+        cout << "These players are almost incompatible. Reinforce your team with other players with higher relationship scores" << "\n";
         cout << "Low relationship scores affect player performance!" << "\n";
 
         if((PlayerA_Attributes.Position_Group == "Receiver" && PlayerB_Attributes.Position == "Quarterback") || (PlayerB_Attributes.Position_Group == "Receiverr" && PlayerA_Attributes.Position == "Quarterback")){
@@ -264,9 +268,8 @@ void NFL_Players::Relationship_Remarks(NFL_Players& PlayerA_Attributes, NFL_Play
         return;
     }
 
-    cout << PlayerA_Attributes.Name << " and " << PlayerB_Attributes.Name << " have an extremely low chemistry score of " << Relationship_Score << "\n";
-    cout << "Avoid putting these players in the same lineup!" << "\n";
-    cout << "Low relationship scores improve player performance" << "\n";
+    cout << PlayerA_Attributes.Name << " and " << PlayerB_Attributes.Name << " do not play on the same side of the ball!" << endl;
+    cout << "A logical comparison cannot be made" << "\n";
     return;
 }
 
@@ -282,94 +285,158 @@ NFL_Players Generate_Player(sqlite3* DB){
     string Defensive_Scheme;
     int Draft_Year;
     int Age;
+    int error_code;
 
-    char querySQL[256];
-    string player_name;
-    cout << "Enter Player Name (WARNING: Include any name Suffixes!): " << endl;
-    getline(cin, player_name);
-    
-    if(player_name.contains("'")){
-        player_name = Escape_Character(player_name);
-    }
+    try
+    {
 
-    snprintf(querySQL, 256, "SELECT COUNT(*) FROM Players WHERE Name = '%s'", player_name.c_str());
-    const char* querySQL_const = querySQL;
-    sqlite3_stmt *statement; // associative table, pointer to first row
-
-    sqlite3_prepare_v2(DB, querySQL_const, -1, &statement, NULL); //prepare statement in binary format
-
-    sqlite3_step(statement);
-
-    if (sqlite3_column_int(statement, 0) > 1){
-        int num_players = sqlite3_column_int(statement, 0);
-        cout << "There are " << num_players << " players with that name" << endl << endl;
-
-        char querySQL_multipleplayers [256];
-        snprintf(querySQL_multipleplayers, 256, "SELECT * FROM Players WHERE Name = '%s'", player_name.c_str());
-        const char* querySQL_multipleplayers_const = querySQL_multipleplayers;
-        sqlite3_stmt *multipleplayers_stmt;
-        sqlite3_prepare_v2(DB, querySQL_multipleplayers_const, -1, &multipleplayers_stmt, NULL);
-
-        while(sqlite3_step(multipleplayers_stmt)!=SQLITE_DONE){
-            cout << player_name << ", Team: " << sqlite3_column_text(multipleplayers_stmt, 3) << ", Position: " << sqlite3_column_text(multipleplayers_stmt, 2) << endl;
+        char querySQL[256];
+        string player_name;
+        cout << endl << "Enter Player Name (WARNING: Include any name Suffixes!): " << endl;
+        getline(cin, player_name);
+        
+        if(player_name.contains("'")){
+            player_name = Escape_Character(player_name);
         }
 
-        cout << "Enter team name for desired player: " << endl;
-        string team_name;
-        getline(cin, team_name);
+        snprintf(querySQL, 256, "SELECT COUNT(*) FROM Players WHERE Name = '%s'", player_name.c_str());
+        const char* querySQL_const = querySQL;
+        sqlite3_stmt *statement; // associative table, pointer to first row
 
-        char querySQL_finalselection [256];
-        snprintf(querySQL_finalselection, 256, "SELECT * FROM Players WHERE Name = '%s' AND Team = '%s'", player_name.c_str(), team_name.c_str());
-        const char* querySQL_finalselection_const = querySQL_finalselection;
-        sqlite3_stmt *final_selection_stmt;
-        sqlite3_prepare_v2(DB, querySQL_finalselection_const, -1, &final_selection_stmt, NULL);
+        sqlite3_prepare_v2(DB, querySQL_const, -1, &statement, NULL); //prepare statement in binary format
 
-        sqlite3_step(final_selection_stmt);
-        Name = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 1));
-        Position = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 2));
-        Team = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 3));
+        sqlite3_step(statement);
 
-        Age = sqlite3_column_int(final_selection_stmt, 4);
+        if (sqlite3_column_int(statement, 0) > 1){
+            int num_players = sqlite3_column_int(statement, 0);
+            cout << endl << "There are " << num_players << " players with that name" << endl << endl;
 
-        Draft_Year = sqlite3_column_int(final_selection_stmt, 5);
-        
-        College = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 6));
+            char querySQL_multipleplayers [256];
+            snprintf(querySQL_multipleplayers, 256, "SELECT * FROM Players WHERE Name = '%s'", player_name.c_str());
+            const char* querySQL_multipleplayers_const = querySQL_multipleplayers;
+            sqlite3_stmt *multipleplayers_stmt;
+            sqlite3_prepare_v2(DB, querySQL_multipleplayers_const, -1, &multipleplayers_stmt, NULL);
+            vector<string> team_options_duplicate_name;
+            while(sqlite3_step(multipleplayers_stmt)!=SQLITE_DONE){
+                cout << player_name << ", Team: " << sqlite3_column_text(multipleplayers_stmt, 3) << ", Position: " << sqlite3_column_text(multipleplayers_stmt, 2) << endl;
+                team_options_duplicate_name.push_back(reinterpret_cast<const char*>(sqlite3_column_text(multipleplayers_stmt, 3)));
+            }
 
+            cout << endl << "Enter team name for desired player: " << endl;
+            string team_name;
+            getline(cin, team_name);
+
+            if(std::find(team_options_duplicate_name.begin(), team_options_duplicate_name.end(), team_name) == team_options_duplicate_name.end()){
+
+                string user_decision;
+                cout << endl << "The team name entered is incorrect! Check for spelling errors!" << endl;
+                cout << "The options are " << team_options_duplicate_name[0] << " and " << team_options_duplicate_name[1] << endl << endl;
+                cout << "Do you want to continue and re-enter the team name? (Y/N): " << endl;
+                getline(cin, user_decision);
+                string team_name_final;
+                if(user_decision[0] == 'y' || user_decision[0] == 'Y'){
+                    while(std::find(team_options_duplicate_name.begin(), team_options_duplicate_name.end(), team_name_final) == team_options_duplicate_name.end()){
+                        cout << endl << "Enter 'N' at any point to exit" << endl;
+                        cout << endl << "Team name is incorrect! Enter team name for desired player: " << endl;
+                        // string team_name;
+                        getline(cin, team_name_final);
+
+                        if(team_name.at(0) == 'N'){
+                            exit(0);
+                        }
+                    }
+                team_name = team_name_final; 
+                }
+
+                else{
+                    exit(0);
+                }
+
+            } 
+            
+            char querySQL_finalselection [256];
+            snprintf(querySQL_finalselection, 256, "SELECT * FROM Players WHERE Name = '%s' AND Team = '%s'", player_name.c_str(), team_name.c_str());
+            const char* querySQL_finalselection_const = querySQL_finalselection;
+            sqlite3_stmt *final_selection_stmt;
+            sqlite3_prepare_v2(DB, querySQL_finalselection_const, -1, &final_selection_stmt, NULL);
+
+            sqlite3_step(final_selection_stmt);
+            Name = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 1));
+            Position = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 2));
+            Team = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 3));
+
+            Age = sqlite3_column_int(final_selection_stmt, 4);
+
+            Draft_Year = sqlite3_column_int(final_selection_stmt, 5);
+            
+            College = reinterpret_cast<const char*>(sqlite3_column_text(final_selection_stmt, 6));
+
+            
+
+            Division = Search_Division(Team);
+            Position_Group = Search_PositionGroup(Position);
+            Broader_Position_Group = Search_Broader_Position_Group (Position_Group);
+            NFL_Players Player_Details(Name, Team, Division, Position, College, Position_Group, Broader_Position_Group, Draft_Year);
+
+            return Player_Details;
+
+        }
+
+        else if(sqlite3_column_int(statement, 0) == 1){
+            char querySQL_singleplayer [256];
+            snprintf(querySQL_singleplayer, 256, "SELECT * FROM Players WHERE Name = '%s'", player_name.c_str());
+            const char* querySQL_singleplayer_const = querySQL_singleplayer;
+            sqlite3_stmt *singleplayer_stmt; // associative table, pointer to first row
+
+            sqlite3_prepare_v2(DB, querySQL_singleplayer_const, -1, &singleplayer_stmt, NULL); //prepare statement in binary format??
+
+            sqlite3_step(singleplayer_stmt);
+            Name = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 1));
+            Position = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 2));
+            Team = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 3));
+
+            Age = sqlite3_column_int(singleplayer_stmt, 4);
+
+            Draft_Year = sqlite3_column_int(singleplayer_stmt, 5);
+
+            College = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 6));
+
+            
+
+            Division = Search_Division(Team);
+            Position_Group = Search_PositionGroup(Position);
+            Broader_Position_Group = Search_Broader_Position_Group (Position_Group);
+            NFL_Players Player_Details(Name, Team, Division, Position, College, Position_Group, Broader_Position_Group, Draft_Year);
+
+            return Player_Details;
+        }
+
+        else
+        {
+            error_code = 1;
+            throw(error_code);
+        }
     }
 
-    else if(sqlite3_column_int(statement, 0) == 1){
-        char querySQL_singleplayer [256];
-        snprintf(querySQL_singleplayer, 256, "SELECT * FROM Players WHERE Name = '%s'", player_name.c_str());
-        const char* querySQL_singleplayer_const = querySQL_singleplayer;
-        sqlite3_stmt *singleplayer_stmt; // associative table, pointer to first row
-
-        sqlite3_prepare_v2(DB, querySQL_singleplayer_const, -1, &singleplayer_stmt, NULL); //prepare statement in binary format??
-
-        sqlite3_step(singleplayer_stmt);
-        Name = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 1));
-        Position = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 2));
-        Team = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 3));
-
-        Age = sqlite3_column_int(singleplayer_stmt, 4);
-
-        Draft_Year = sqlite3_column_int(singleplayer_stmt, 5);
-
-        College = reinterpret_cast<const char*>(sqlite3_column_text(singleplayer_stmt, 6));
-    }
-
-    else{
+    catch(int input_error)
+    {
+        string user_decision;
+        cout << endl << "That does not sound like an NFL player!" << endl;
         cout << "The player name entered is incorrect! Check for spelling errors or missing suffixes!" << endl;
-        exit(0);
-    }
-    
-    Division = Search_Division(Team);
-    Position_Group = Search_PositionGroup(Position);
-    Broader_Position_Group = Search_Broader_Position_Group (Position_Group);
-    NFL_Players Player_Details(Name, Team, Division, Position, College, Position_Group, Broader_Position_Group, Draft_Year);
-    
-    return Player_Details;
+        cout << "Do you want to continue and re-enter a player's name? (Y/N): " << endl;
+        getline(cin, user_decision);
 
-}
+        if(user_decision[0] == 'y' || user_decision[0] == 'Y'){
+            NFL_Players Player = Generate_Player(DB);
+            return Player;
+        }
+
+        else{
+            exit(0);
+        }
+    } 
+
+}  
 
 string Search_Division(string Team_Name){
 
@@ -431,4 +498,30 @@ string Defensive_Scheme(string Team_Name){
     defense_scheme = (List_of_Offensive_Defensive_Schemes[Team_Name]).second;
 
     return defense_scheme;
+}
+
+void Main_Func(){
+
+sqlite3* DB;
+char* errmsg = nullptr;
+
+if(sqlite3_open("Player_Data_June27_2025.db", &DB)){
+    cout << "DB cannot be opened: " << sqlite3_errmsg(DB) << endl;
+    exit(0);
+}
+
+NFL_Players Player_1 = Generate_Player(DB);
+
+cout << "Press Enter to add a second player!" << endl;
+string empty;
+getline(cin, empty);
+
+NFL_Players Player_2 = Generate_Player(DB);
+
+NFL_Players::Calculate_Player_Relationship_Score(Player_1, Player_2);
+NFL_Players::Relationship_Remarks(Player_1, Player_2);
+
+
+sqlite3_close(DB);
+
 }

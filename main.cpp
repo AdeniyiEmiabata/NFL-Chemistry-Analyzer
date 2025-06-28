@@ -9,29 +9,16 @@
 
 using namespace std;
 int main(){
+    cout << endl << endl;
+    cout << "Welcome! This is the NFL Player Chemistry Analyzer." << endl; 
+    cout << "This tool is used for assessing potential chemistry between two active NFL players." << endl;
+    cout << "A Madden Ultimate Team/FIFA Ultimate Team-style algorithm is used to generate a relationship score." << endl;
+    cout << "Scores are based on player details, such as team, offensive/defensive schemes, draft year, and more!" << endl;
+    cout << "Player data is accurate, as of June 27th, 2025" << endl;
+    cout << "Enjoy!" << endl;
 
-sqlite3* DB;
-char* errmsg = nullptr;
+    Main_Func();
 
-if(sqlite3_open("Player_Data_June11_2025.db", &DB)){
-    cout << "DB cannot be opened: " << sqlite3_errmsg(DB) << endl;
-    exit(0);
-}
-
-NFL_Players Player_1 = Generate_Player(DB);
-
-cout << "Press Enter to add a second player!" << endl;
-string empty;
-getline(cin, empty);
-//std::cout << "PLAYER 2" << "\n";
-NFL_Players Player_2 = Generate_Player(DB);
-
-NFL_Players::Calculate_Player_Relationship_Score(Player_1, Player_2);
-NFL_Players::Relationship_Remarks(Player_1, Player_2);
-
-
-sqlite3_close(DB);
-
-return 0;
+    return 0;
 
 }
