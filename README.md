@@ -9,9 +9,9 @@ Player data is gotten from ESPN's NFL API and is accurate, as of June 27th, 2025
 
 ### To use this application:
 
-**docker pull adeniyiemiabata/nfl:latest
+**docker pull adeniyiemiabata/nfl:latest**
 
-docker run -it adeniyiemiabata/nfl:latest**
+**docker run -it adeniyiemiabata/nfl:latest**
 
 Thank you!
 
