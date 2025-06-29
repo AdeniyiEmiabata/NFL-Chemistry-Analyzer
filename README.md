@@ -12,3 +12,8 @@ docker pull adeniyiemiabata/nfl:latest
 docker run -it adeniyiemiabata/nfl:latest
 
 Thank you!
+
+![Screenshot 2025-06-28 at 9 21 27 PM](https://github.com/user-attachments/assets/1e60bc23-22f8-4d59-943d-c264523bdf08) ![Image 6-28-25 at 9 24 PM](https://github.com/user-attachments/assets/0775eb67-a08a-4c5b-a94f-7ad42df41149)
+
+
+
